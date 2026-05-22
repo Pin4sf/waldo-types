@@ -1,7 +1,7 @@
 {
   "name": "@waldo/types",
-  "version": "1.0.0",
-  "description": "Shared TypeScript contracts for Waldo — health, agent, API, memory, adapter interfaces",
+  "version": "0.0.1",
+  "description": "Shared TypeScript contracts for Waldo — cross-repo shapes only (health, agent, API responses)",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": ["dist"],
