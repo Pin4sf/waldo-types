@@ -90,15 +90,27 @@ Commit message ≤70 chars subject. Body explains the WHY (not WHAT — diff sho
 - Never embed secrets in types (no API key constants, no production URLs)
 - Never log raw health values (HRV, HR, sleep hours, SpO2) — applies even in test fixtures
 
-## Build → Break → Fix philosophy
+## Mental model (the 4 non-negotiable disciplines)
 
-1. Define interface from ADR
-2. Write Zod schema
-3. Write `z.infer` derived type
-4. Write failing test (golden fixture)
-5. Implement until green
-6. Run /grill-me on the interface — try to break it semantically
-7. Lock as accepted in ADR
+Before any work, read **`waldo-brain/.claude/rules/mental-model.md`**. It is the meta-rule that all other rules build on. Summary:
+
+1. **Problem-first thinking** — find ROOT CAUSE at system + library level. Never patch symptoms. Use `/diagnose`.
+2. **Product-first thinking** — every line traces to a JTBD. If you can't name the user problem, delete it. Use `/grill-me`.
+3. **First-principles thinking** — decompose every claim to physics-level constraints. Cite primary sources. Use `/grill-with-docs`.
+4. **Test-heavy + thorough QA** — E2E is the only truth. Failing test FIRST. Use `/tdd` + `qa-breaker`.
+
+## Build → Break → Fix philosophy (for THIS repo)
+
+1. Read the ADR (the source-of-truth spec)
+2. **First-principles check** — does the ADR actually solve the JTBD? If the ADR feels off, push back BEFORE coding.
+3. Write Zod schema from the ADR's contract
+4. Write `z.infer` derived type
+5. **Test-first** — failing golden test (valid + invalid pairs) BEFORE implementation. `/tdd`.
+6. Implement until green
+7. Run `/grill-me` on the interface — try to break it semantically
+8. Run `/grill-with-docs` — verify the interface still matches its grounding ADR + research
+9. Open PR with `Closes HEY-NN`
+10. If anything fails downstream after merge — `/diagnose` for ROOT CAUSE, never quick patch
 
 ## Source of truth
 

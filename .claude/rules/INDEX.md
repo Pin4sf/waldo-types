@@ -2,8 +2,9 @@
 
 All canonical rules live in `waldo-brain/.claude/rules/` and `waldo-brain/01-Waldo/Architecture Decision Records (ADR)/`. This index points at the ones an agent working in this repo MUST read before generating code.
 
-## Hard rules (read first)
+## Hard rules (read first — IN ORDER)
 
+0. **`waldo-brain/.claude/rules/mental-model.md`** — **READ THIS FIRST. Always.** 4 non-negotiable disciplines: Problem-first thinking · Product-first thinking · First-principles thinking · Test-heavy + thorough QA. Every other rule builds on these.
 1. **`waldo-brain/.claude/rules/coding-standards.md`** — TypeScript strict mode + Zod + named exports + path aliases + file size cap. Section "TypeScript" applies verbatim.
 2. **`waldo-brain/.claude/rules/architecture.md`** — Locked Decision 1 (Three repos, one type contract). Section "Adapter Pattern" defines which interfaces must exist.
 3. **`waldo-brain/.claude/rules/health-data-security.md`** — Privacy rules apply even at the type level. PII tagging required on Calendar event titles, Task titles, etc.
