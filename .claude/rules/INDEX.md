@@ -48,6 +48,8 @@ Read these before touching the related types:
 
 When working here, the following skills SHOULD activate:
 
+- `/session-bus` — **MANDATORY at session start AND end.** Cross-session bus, see ADR-0043.
+
 - `/grill-me` — before locking any interface
 - `/grill-with-docs` — when extending types based on a new ADR
 - `/tdd` — write failing Zod schema + golden test before implementation
