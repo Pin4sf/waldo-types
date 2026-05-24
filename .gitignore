@@ -2,3 +2,9 @@ node_modules/
 dist/
 *.js.map
 .env*
+.npmrc
+
+# Claude Code dev environment (per-developer, not source)
+.agents/
+.claude/skills/*
+!.claude/skills/session-bus.md
