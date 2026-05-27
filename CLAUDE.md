@@ -98,6 +98,7 @@ Before any work, read **`waldo-brain/.claude/rules/mental-model.md`**. It is the
 2. **Product-first thinking** — every line traces to a JTBD. If you can't name the user problem, delete it. Use `/grill-me`.
 3. **First-principles thinking** — decompose every claim to physics-level constraints. Cite primary sources. Use `/grill-with-docs`.
 4. **Test-heavy + thorough QA** — E2E is the only truth. Failing test FIRST. Use `/tdd` + `qa-breaker`.
+5. **NO AI SLOP** — every line earns its place. Slop = correct-but-bad: verbose where tight wins, generic where specific is needed, hedged where opinion was asked, format-drift, unrequested disclaimers, junk that fills context windows for the next session. Each line of code answers: WHY is it here, is it solving the requested purpose, is it the real fix not a patch, would a thoughtful reviewer ship it without changes. Delete anything that fails the test. See `waldo-brain/.claude/rules/mental-model.md` §5.
 
 ## Build → Break → Fix philosophy (for THIS repo)
 
