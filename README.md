@@ -11,17 +11,36 @@ npm install @pin4sf/waldo-types
 
 ## Package structure
 
+v0.2.0 — full runtime-spine contract (ADR-0029 amendments 2026-05-30 / 2026-06-02).
+
 ```
 src/
-├── core/        TriggerType, BriefVariant, InvocationContext, AutonomyLevel, User, ErrorCode, ISO8601
+├── core/        TriggerType, BriefVariant, InvocationContext, AutonomyLevel, User, ErrorCode,
+│                ISO8601, HookEvent/HookPayload (9 events), SanitiseDestination (10)
 ├── ui/          WaldoCard (10 variants), PushPayload
 ├── tools/       ToolHandler, ToolResult, 29 Zod arg schemas, TOOL_PERMISSIONS map
-├── adapters/    9 interfaces: channel, doc, sheet, email, calendar*, task, health, llm, transcription*
-├── memory/      HallType (5), MemoryBlock, Episode, Skill
-└── telemetry/   AgentLog, OutcomeSignal, EffectivenessSignal
+├── adapters/    10 interfaces: channel, doc, sheet, email, calendar*, task, health, llm,
+│                transcription*, WorkspaceMount (R2 mount)
+├── memory/      HallType (5), MemoryBlock, Episode, Skill, RecallResult/RetrieveResult
+├── telemetry/   AgentLog, OutcomeSignal, EffectivenessSignal, TraceEval, KeepRateEvent
+├── runtime/     RoutingPolicy, RunState/RunRecord/OutboxEntry, SessionState, CarryoverBucket
+├── health/      CrsResult, Zone (energized/steady/flagging/depleted), PillarBreakdown
+└── prompt/      NarrativeContext (body+mind universal-context block)
 ```
 
 \* Stub interface — implementation ships Sprint 2/3 per ADR-0040/0041.
+
+## Public API
+
+Root-only — import everything from the package root, not subpaths:
+
+```typescript
+import { ... } from '@pin4sf/waldo-types';   // ✅
+import { ... } from '@pin4sf/waldo-types/runtime'; // ✗ not exported
+```
+
+The single `"."` entry is the deliberate contract surface (small interface, deep module):
+consumers depend on the symbols, not the internal barrel layout.
 
 ## Usage
 
@@ -30,9 +49,11 @@ import {
   type InvocationContext,
   type WaldoCard,
   type ToolHandler,
+  type CrsResult,
   getCrsArgs,
   writeTaskArgs,
   TOOL_PERMISSIONS,
+  carryoverBucketSchema,
 } from '@pin4sf/waldo-types';
 
 // Validate tool args from LLM output
@@ -40,6 +61,9 @@ const args = writeTaskArgs.parse(rawInput);
 
 // Check tool ACL for a trigger
 const allowed = TOOL_PERMISSIONS.brief; // ['get_crs', 'get_health', ...]
+
+// Parse a runtime contract at a boundary
+const bucket = carryoverBucketSchema.parse(rawBucket); // enforces ADR-0057 caps
 
 // Implement a tool handler
 const handler: ToolHandler<typeof args, { task_id: string }> = {

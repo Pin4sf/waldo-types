@@ -4,3 +4,6 @@ export * from './tools/index';
 export * from './adapters/index';
 export * from './memory/index';
 export * from './telemetry/index';
+export * from './health/index';
+export * from './runtime/index';
+export * from './prompt/index';

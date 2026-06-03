@@ -1,16 +1,11 @@
 import { z } from 'zod';
 import { errorCodeSchema, iso8601Schema } from '../core/error';
+import { crsResultSchema, type CrsResult } from '../health/crs';
 
 // Raw values (HRV, HR, sleep hours, SpO2) NEVER in type names or logs (mental-model.md)
-// CrsResult is a derived composite — not raw data
-
-export const crsResultSchema = z.object({
-  score: z.number().min(0).max(100),
-  zone: z.enum(['peak', 'steady', 'flagging', 'depleted']),
-  computed_at: iso8601Schema,
-  component_count: z.number().int().min(1),  // how many signals contributed
-});
-export type CrsResult = z.infer<typeof crsResultSchema>;
+// CrsResult + Zone are the single source in health/crs.ts; re-export so callers of the
+// HealthDataSource adapter keep importing them from here.
+export { crsResultSchema, type CrsResult } from '../health/crs';
 
 export const healthSnapshotSchema = z.object({
   user_id: z.string(),

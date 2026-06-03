@@ -194,6 +194,21 @@ describe('proposeScheduleArgs', () => {
       attendees: ['a@b.com'], duration_min: 5, title: 'x',
     })).toThrow();
   });
+  it('valid: prefer_user_form_zone energized (peak → energized, v0.2.0 canonical)', () => {
+    expect(() => proposeScheduleArgs.parse({
+      attendees: ['a@b.com'], duration_min: 30, title: 'Sync', prefer_user_form_zone: 'energized',
+    })).not.toThrow();
+  });
+  it('valid: prefer_user_form_zone avoid_trough (scheduling intent, not a Zone value)', () => {
+    expect(() => proposeScheduleArgs.parse({
+      attendees: ['a@b.com'], duration_min: 30, title: 'Sync', prefer_user_form_zone: 'avoid_trough',
+    })).not.toThrow();
+  });
+  it('invalid: prefer_user_form_zone peak (stale, removed v0.2.0)', () => {
+    expect(() => proposeScheduleArgs.parse({
+      attendees: ['a@b.com'], duration_min: 30, title: 'Sync', prefer_user_form_zone: 'peak',
+    })).toThrow();
+  });
 });
 
 describe('writeSheetCellArgs', () => {

@@ -67,7 +67,12 @@ describe('crsResultSchema', () => {
   });
   it('invalid: score > 100', () => {
     expect(() => crsResultSchema.parse({
-      score: 105, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 4,
+      score: 105, zone: 'energized', computed_at: '2026-01-01T06:00:00Z', component_count: 4,
+    })).toThrow();
+  });
+  it('invalid: zone peak removed v0.2.0', () => {
+    expect(() => crsResultSchema.parse({
+      score: 80, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 4,
     })).toThrow();
   });
 });
@@ -76,7 +81,7 @@ describe('healthSnapshotSchema', () => {
   it('valid', () => {
     expect(() => healthSnapshotSchema.parse({
       user_id: 'u', date: '2026-01-01T06:00:00Z',
-      crs: { score: 80, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
+      crs: { score: 80, zone: 'energized', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
       recovery_category: 'good', sleep_quality_category: 'optimal',
       strain_level: 'low', has_wearable_data: true, sources: ['whoop'],
     })).not.toThrow();
@@ -84,7 +89,7 @@ describe('healthSnapshotSchema', () => {
   it('invalid: unknown recovery_category', () => {
     expect(() => healthSnapshotSchema.parse({
       user_id: 'u', date: '2026-01-01T06:00:00Z',
-      crs: { score: 80, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
+      crs: { score: 80, zone: 'energized', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
       recovery_category: 'excellent', sleep_quality_category: 'optimal',
       strain_level: 'low', has_wearable_data: true, sources: [],
     })).toThrow();
@@ -230,10 +235,19 @@ describe('CalendarProvider structural (stub)', () => {
     const mock: CalendarProvider = {
       provider: 'google_calendar',
       query_events: async () => ({ ok: true, events: [] }),
-      find_slots: async () => ({ ok: true, slots: [] }),
+      // find_slots.prefer_zone accepts the v0.2.0 canonical Form-zone value (peak → energized)
+      find_slots: async (args) => { void args.prefer_zone; return { ok: true, slots: [] }; },
       propose_event: async () => ({ ok: true, event_id: 'ev_01', decision_id: 'dec_01' }),
     };
     expect(mock.provider).toBe('google_calendar');
+  });
+  it('prefer_zone is type-only — energized assignable, peak rejected (v0.2.0 canonical)', () => {
+    // type-level proof: a TS union cannot be runtime-rejected, so tsc carries the assertion.
+    const energized: Parameters<CalendarProvider['find_slots']>[0]['prefer_zone'] = 'energized';
+    expect(energized).toBe('energized');
+    // @ts-expect-error 'peak' is stale (removed v0.2.0); typecheck fails if it ever re-enters the union
+    const peak: Parameters<CalendarProvider['find_slots']>[0]['prefer_zone'] = 'peak';
+    void peak;
   });
 });
 

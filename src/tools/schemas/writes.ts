@@ -60,7 +60,7 @@ export const proposeScheduleArgs = z.object({
   description_markdown: z.string().max(2000).optional(),
   earliest: iso8601Schema.optional(),
   latest: iso8601Schema.optional(),
-  prefer_user_form_zone: z.enum(['peak', 'steady', 'avoid_trough']).optional(),
+  prefer_user_form_zone: z.enum(['energized', 'steady', 'avoid_trough']).optional(),
 });
 export type ProposeScheduleArgs = z.infer<typeof proposeScheduleArgs>;
 

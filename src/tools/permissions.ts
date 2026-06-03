@@ -49,16 +49,22 @@ export const TOOL_PERMISSIONS: ToolPermissions = {
   intervention: [
     'get_crs', 'get_health', 'read_memory', 'update_task', 'propose_action',
   ],
+  // execute_code stays typed in toolNameSchema but is removed from every V1 ACL (ADR-0050,
+  // Phase 3 / Pro Max gated). It is no longer in user_message or dreaming_mode.
   user_message: [
     'get_crs', 'get_health', 'query_calendar', 'get_communication', 'get_tasks',
     'get_master_metrics', 'get_context', 'read_memory', 'update_memory',
     'search_episodes', 'search_connector', 'web_search', 'read_document', 'call_mcp_tool',
     'write_task', 'update_task', 'draft_document', 'draft_email',
-    'propose_schedule', 'write_sheet_cell', 'execute_code',
+    'propose_schedule', 'write_sheet_cell',
     'propose_action', 'execute_action', 'send_message',
     'create_thread', 'delete_message', 'restore_message', 'archive_thread', 'update_thread_topics',
   ],
   dreaming_mode: [
-    'read_memory', 'update_memory', 'search_episodes', 'execute_code',
+    'read_memory', 'update_memory', 'search_episodes',
+  ],
+  // read + propose only — never silent (ADR-0042)
+  pre_activity_spot: [
+    'get_crs', 'query_calendar', 'read_memory', 'propose_schedule', 'propose_action', 'send_message',
   ],
 };
