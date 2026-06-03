@@ -8,3 +8,4 @@ dist/
 .agents/
 .claude/skills/*
 !.claude/skills/session-bus.md
+skills-lock.json

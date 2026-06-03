@@ -25,6 +25,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm run test",
     "changeset": "changeset",
     "release": "changeset publish"
   },
