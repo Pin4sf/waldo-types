@@ -81,19 +81,55 @@ describe('outboxEntrySchema', () => {
 });
 
 describe('sessionStateSchema (ADR-0033)', () => {
+  const validCanaries = ['0123456789abcdef', '0011223344556677', '8899aabbccddeeff'];
   it('valid: reset slate', () => {
     expect(() => sessionStateSchema.parse({
       toolPermissions: ['get_crs', 'send_message'],
-      canaryTokens: ['aaaa', 'bbbb', 'cccc'],
+      canaryTokens: validCanaries,
       rateLimitWindow: { start: 0, tool_counts: {} },
     })).not.toThrow();
   });
   it('invalid: tool permission not in ToolName union', () => {
     expect(() => sessionStateSchema.parse({
       toolPermissions: ['delete_everything'],
-      canaryTokens: [],
+      canaryTokens: validCanaries,
       rateLimitWindow: { start: 0, tool_counts: {} },
     })).toThrow();
+  });
+  // Canary invariants — ADR-0032 line 64 pins "fresh per session, 16-char hex × 3".
+  const baseValid = {
+    toolPermissions: ['get_crs'],
+    rateLimitWindow: { start: 0, tool_counts: {} },
+  };
+  it('invalid canary: empty array', () => {
+    expect(sessionStateSchema.safeParse({ ...baseValid, canaryTokens: [] }).success).toBe(false);
+  });
+  it('invalid canary: 2 tokens (length != 3)', () => {
+    expect(sessionStateSchema.safeParse({
+      ...baseValid, canaryTokens: ['0123456789abcdef', '0011223344556677'],
+    }).success).toBe(false);
+  });
+  it('invalid canary: 4 tokens (length != 3)', () => {
+    expect(sessionStateSchema.safeParse({
+      ...baseValid,
+      canaryTokens: ['0123456789abcdef', '0011223344556677', '8899aabbccddeeff', 'fedcba9876543210'],
+    }).success).toBe(false);
+  });
+  it('invalid canary: one short token (15 chars)', () => {
+    expect(sessionStateSchema.safeParse({
+      ...baseValid, canaryTokens: ['0123456789abcde', '0011223344556677', '8899aabbccddeeff'],
+    }).success).toBe(false);
+  });
+  it('invalid canary: one non-hex token', () => {
+    expect(sessionStateSchema.safeParse({
+      ...baseValid, canaryTokens: ['gggggggggggggggg', '0011223344556677', '8899aabbccddeeff'],
+    }).success).toBe(false);
+  });
+  it('invalid canary: two duplicates (case-insensitive)', () => {
+    expect(sessionStateSchema.safeParse({
+      ...baseValid,
+      canaryTokens: ['0123456789abcdef', '0123456789ABCDEF', 'fedcba9876543210'],
+    }).success).toBe(false);
   });
 });
 

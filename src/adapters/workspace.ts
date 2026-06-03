@@ -17,24 +17,32 @@ export type WorkspaceFile = z.infer<typeof workspaceFileSchema>;
 
 // Per-user skills dir (waldo-workspace/{user_id}/skills/{name}). Single segment only — the
 // regex rejects `..`, dot-only, and nested segments so the path can't escape the mount.
-export type WorkspaceSkillPath = `skills/${string}`;
 const SKILLS_PATH = /^skills\/(?=.*[A-Za-z0-9_-])[A-Za-z0-9._-]+$/;
 
-// Runtime guard for the writable path surface. Zod 3 has no template-literal type, so the
-// inferred type widens to string — the precise `WorkspaceFile | WorkspaceSkillPath` lives on
-// the interface signatures below (the type-level guard); this is the parse-time guard.
+// Runtime guard for the writable path surface.
 export const workspacePathSchema = z.union([
   workspaceFileSchema,
   z.string().regex(SKILLS_PATH),
 ]);
-export type WorkspacePath = WorkspaceFile | WorkspaceSkillPath;
+
+// Brand type: WorkspacePath values can only be produced by parseWorkspacePath() (which runs the schema).
+// Reason: a raw string like 'skills/../etc/passwd' is type-compatible with `skills/${string}`, so the
+// adapter interface alone gives no compile-time guard. Branding closes that gap — `readFile(rawString)`
+// becomes a type error; callers must parse first, forcing the runtime check.
+declare const workspacePathBrand: unique symbol;
+export type WorkspacePath = string & { readonly [workspacePathBrand]: true };
+
+export function parseWorkspacePath(input: unknown): WorkspacePath {
+  return workspacePathSchema.parse(input) as WorkspacePath;
+}
 
 export interface WorkspaceMount {
   readFile(path: WorkspacePath): Promise<Uint8Array | null>;
   writeFile(path: WorkspacePath, bytes: Uint8Array): Promise<void>;
-  // list(prefix) stays broad: prefix-listing R2 keys is deliberately outside the path enum —
-  // a prefix is a directory fragment, not a file the agent reads/writes.
-  list(prefix: string): Promise<string[]>;
+  // list(prefix) takes a broad prefix (intentional): prefix-listing R2 keys is deliberately
+  // outside the path enum — a prefix is a directory fragment, not a file the agent reads/writes.
+  // Returns branded WorkspacePath[] so callers don't need to re-parse trusted output.
+  list(prefix: string): Promise<WorkspacePath[]>;
   commit(message: string): Promise<{ change_id: string }>;
   discard(): void;
 }

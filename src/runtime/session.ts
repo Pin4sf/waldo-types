@@ -11,11 +11,21 @@ export const rateLimitWindowSchema = z.object({
 });
 export type RateLimitWindow = z.infer<typeof rateLimitWindowSchema>;
 
+// 16-char hex, exactly 3, unique — ADR-0032 line 64 pins "fresh per session, 16-char hex × 3".
+// Each constraint is load-bearing: the regex enforces the format the leak-check scans for;
+// .length(3) enforces the cardinality (3 independent tokens widens the detection surface);
+// uniqueness via superRefine prevents 3 identical tokens from collapsing to 1 effective canary.
+export const canaryTokenSchema = z.string().regex(/^[0-9a-f]{16}$/i);
+
 export const sessionStateSchema = z.object({
   // rebuilt from TOOL_PERMISSIONS[ctx.trigger] — deny-first, never carried forward
   toolPermissions: z.array(toolNameSchema),
   // 3 fresh 16-char hex tokens per session
-  canaryTokens: z.array(z.string()),
+  canaryTokens: z.array(canaryTokenSchema).length(3).superRefine((tokens, ctx) => {
+    if (new Set(tokens.map((t) => t.toLowerCase())).size !== tokens.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'canary tokens must be unique' });
+    }
+  }),
   iterationCount: z.number().int().min(0).default(0),
   // session-scoped spend, USD; daily cumulative tracked separately
   costSpent: z.number().min(0).default(0),

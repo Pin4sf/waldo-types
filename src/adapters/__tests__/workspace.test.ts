@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { workspaceFileSchema, workspacePathSchema, type WorkspaceMount, type R2Mount } from '../workspace';
+import {
+  workspaceFileSchema,
+  workspacePathSchema,
+  parseWorkspacePath,
+  type WorkspaceMount,
+  type R2Mount,
+} from '../workspace';
 
 describe('workspaceFileSchema', () => {
   const files = [
@@ -45,5 +51,29 @@ describe('WorkspaceMount / R2Mount structural', () => {
     };
     const r2: R2Mount = mock;
     expect((await r2.commit('msg')).change_id).toBe('c_01');
+  });
+});
+
+describe('WorkspacePath branding (compile-time guard)', () => {
+  // Mock used purely for the type-assertion test cases below.
+  const mount: WorkspaceMount = {
+    readFile: async () => null,
+    writeFile: async () => undefined,
+    list: async () => [],
+    commit: async () => ({ change_id: 'c_01' }),
+    discard: () => undefined,
+  };
+
+  it('rejects raw string at the type level; accepts parsed WorkspacePath', () => {
+    // Without @ts-expect-error this line would fail tsc — branding makes raw string non-assignable.
+    // @ts-expect-error — raw string is not assignable to branded WorkspacePath
+    void mount.readFile('arbitrary-string');
+    // Parsed path compiles cleanly — no @ts-expect-error needed.
+    void mount.readFile(parseWorkspacePath('today.md'));
+    expect(true).toBe(true);
+  });
+
+  it('parseWorkspacePath throws on traversal (applies schema, not blind cast)', () => {
+    expect(() => parseWorkspacePath('skills/../etc/passwd')).toThrow();
   });
 });
