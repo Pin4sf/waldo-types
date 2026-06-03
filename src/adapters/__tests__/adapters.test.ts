@@ -67,7 +67,12 @@ describe('crsResultSchema', () => {
   });
   it('invalid: score > 100', () => {
     expect(() => crsResultSchema.parse({
-      score: 105, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 4,
+      score: 105, zone: 'energized', computed_at: '2026-01-01T06:00:00Z', component_count: 4,
+    })).toThrow();
+  });
+  it('invalid: zone peak removed v0.2.0', () => {
+    expect(() => crsResultSchema.parse({
+      score: 80, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 4,
     })).toThrow();
   });
 });
@@ -76,7 +81,7 @@ describe('healthSnapshotSchema', () => {
   it('valid', () => {
     expect(() => healthSnapshotSchema.parse({
       user_id: 'u', date: '2026-01-01T06:00:00Z',
-      crs: { score: 80, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
+      crs: { score: 80, zone: 'energized', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
       recovery_category: 'good', sleep_quality_category: 'optimal',
       strain_level: 'low', has_wearable_data: true, sources: ['whoop'],
     })).not.toThrow();
@@ -84,7 +89,7 @@ describe('healthSnapshotSchema', () => {
   it('invalid: unknown recovery_category', () => {
     expect(() => healthSnapshotSchema.parse({
       user_id: 'u', date: '2026-01-01T06:00:00Z',
-      crs: { score: 80, zone: 'peak', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
+      crs: { score: 80, zone: 'energized', computed_at: '2026-01-01T06:00:00Z', component_count: 5 },
       recovery_category: 'excellent', sleep_quality_category: 'optimal',
       strain_level: 'low', has_wearable_data: true, sources: [],
     })).toThrow();

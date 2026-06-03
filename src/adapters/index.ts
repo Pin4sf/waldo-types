@@ -7,3 +7,4 @@ export * from './task';
 export * from './health';
 export * from './llm';
 export * from './transcription';
+export * from './workspace';

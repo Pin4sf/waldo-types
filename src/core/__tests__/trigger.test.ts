@@ -5,15 +5,16 @@ describe('triggerTypeSchema', () => {
   const valid = [
     'brief', 'fetch_alert', 'patrol', 'handoff_explore', 'handoff_plan',
     'handoff_act', 'handoff_replan', 'intervention', 'user_message', 'dreaming_mode',
+    'pre_activity_spot',
   ] as const;
 
-  it('accepts all 10 trigger types', () => {
+  it('accepts all 11 trigger types', () => {
     for (const t of valid) {
       expect(triggerTypeSchema.parse(t)).toBe(t);
     }
   });
-  it('rejects pre_activity_spot (v0.2.0)', () => {
-    expect(() => triggerTypeSchema.parse('pre_activity_spot')).toThrow();
+  it('accepts pre_activity_spot (added v0.2.0, ADR-0042)', () => {
+    expect(triggerTypeSchema.parse('pre_activity_spot')).toBe('pre_activity_spot');
   });
   it('rejects unknown trigger', () => {
     expect(() => triggerTypeSchema.parse('morning_wag')).toThrow();
@@ -41,7 +42,7 @@ describe('invocationContextSchema', () => {
         variant: 'morning',
         triggeredAt: '2026-01-01T06:30:00Z',
         canaryTokens: [],
-        zone: 'peak',
+        zone: 'energized',
         user: {
           id: 'user_01', name: 'Shivansh', timezone: 'Asia/Kolkata',
           chronotype: 'morning', wake_time: '06:30', evening_time: '22:00',
