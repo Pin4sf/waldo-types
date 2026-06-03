@@ -30,6 +30,24 @@ describe('hookPayloadSchema', () => {
       event: 'PreToolUse', traceId: 't1', trigger: 'user_message', toolArgs: {},
     })).toThrow();
   });
+  it('invalid: non-canonical trigger rejected', () => {
+    expect(() => hookPayloadSchema.parse({
+      event: 'PreToolUse', traceId: 't1', trigger: 'morning_wag',
+      toolName: 'send_message', toolArgs: {},
+    })).toThrow();
+  });
+  it('invalid: non-ToolName toolName rejected', () => {
+    expect(() => hookPayloadSchema.parse({
+      event: 'PreToolUse', traceId: 't1', trigger: 'user_message',
+      toolName: 'delete_everything', toolArgs: {},
+    })).toThrow();
+  });
+  it('invalid: unknown model rejected', () => {
+    expect(() => hookPayloadSchema.parse({
+      event: 'PreLLMCall', traceId: 't1', trigger: 'brief',
+      prompt: 'p', model: 'gpt-5',
+    })).toThrow();
+  });
   it('narrows by event discriminant', () => {
     const payload = hookPayloadSchema.parse({
       event: 'PostLLMCall', traceId: 't1', trigger: 'brief',

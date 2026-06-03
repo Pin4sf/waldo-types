@@ -26,11 +26,29 @@ export const carryoverEntrySchema = z.object({
 });
 export type CarryoverEntry = z.infer<typeof carryoverEntrySchema>;
 
+// Caps are bounded for compaction/resume determinism (ADR-0057), so the schema enforces them:
+// the published cap must match the bucket's ADR-0057 value, and entries never exceed it.
 export const carryoverBucketSchema = z.object({
   name: carryoverBucketNameSchema,
   cap: z.number().int().min(1),
   // LRU — most recent last; length never exceeds cap
   entries: z.array(carryoverEntrySchema),
+}).superRefine((bucket, ctx) => {
+  const expected = CARRYOVER_BUCKET_CAPS[bucket.name];
+  if (bucket.cap !== expected) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['cap'],
+      message: `cap for ${bucket.name} must be ${expected} (ADR-0057), got ${bucket.cap}`,
+    });
+  }
+  if (bucket.entries.length > bucket.cap) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['entries'],
+      message: `entries (${bucket.entries.length}) exceed cap ${bucket.cap}`,
+    });
+  }
 });
 export type CarryoverBucket = z.infer<typeof carryoverBucketSchema>;
 

@@ -112,6 +112,16 @@ describe('working-memory carryover (ADR-0057)', () => {
   it('carryoverBucketSchema invalid: unknown bucket name', () => {
     expect(() => carryoverBucketSchema.parse({ name: 'scratch', cap: 10, entries: [] })).toThrow();
   });
+  it('carryoverBucketSchema invalid: cap mismatched against ADR-0057', () => {
+    expect(() => carryoverBucketSchema.parse({ name: 'read_file_state', cap: 999, entries: [] })).toThrow();
+  });
+  it('carryoverBucketSchema invalid: entries exceed cap', () => {
+    const entries = Array.from({ length: 7 }, (_, i) => ({
+      at: '2026-01-01T06:00:00Z', summary: `read ${i}`,
+    }));
+    // read_file_state cap is 6 — a 7th entry must be rejected (cap matches, length trips)
+    expect(() => carryoverBucketSchema.parse({ name: 'read_file_state', cap: 6, entries })).toThrow();
+  });
   it('compactAttachmentSchema valid', () => {
     expect(() => compactAttachmentSchema.parse({
       bucket: 'read_file_state', rendered: '...', entry_count: 3,

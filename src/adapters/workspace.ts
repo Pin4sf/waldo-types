@@ -15,9 +15,25 @@ export const workspaceFileSchema = z.enum([
 ]);
 export type WorkspaceFile = z.infer<typeof workspaceFileSchema>;
 
+// Per-user skills dir (waldo-workspace/{user_id}/skills/{name}). Single segment only — the
+// regex rejects `..`, dot-only, and nested segments so the path can't escape the mount.
+export type WorkspaceSkillPath = `skills/${string}`;
+const SKILLS_PATH = /^skills\/(?=.*[A-Za-z0-9_-])[A-Za-z0-9._-]+$/;
+
+// Runtime guard for the writable path surface. Zod 3 has no template-literal type, so the
+// inferred type widens to string — the precise `WorkspaceFile | WorkspaceSkillPath` lives on
+// the interface signatures below (the type-level guard); this is the parse-time guard.
+export const workspacePathSchema = z.union([
+  workspaceFileSchema,
+  z.string().regex(SKILLS_PATH),
+]);
+export type WorkspacePath = WorkspaceFile | WorkspaceSkillPath;
+
 export interface WorkspaceMount {
-  readFile(path: string): Promise<Uint8Array | null>;
-  writeFile(path: string, bytes: Uint8Array): Promise<void>;
+  readFile(path: WorkspacePath): Promise<Uint8Array | null>;
+  writeFile(path: WorkspacePath, bytes: Uint8Array): Promise<void>;
+  // list(prefix) stays broad: prefix-listing R2 keys is deliberately outside the path enum —
+  // a prefix is a directory fragment, not a file the agent reads/writes.
   list(prefix: string): Promise<string[]>;
   commit(message: string): Promise<{ change_id: string }>;
   discard(): void;
