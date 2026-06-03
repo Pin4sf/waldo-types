@@ -13,7 +13,8 @@
   **Edited:** `tools/permissions.ts` removes `execute_code` from `TOOL_PERMISSIONS.user_message` and `.dreaming_mode` (ADR-0050); the type stays in the `ToolName` union (typed-but-disabled, Phase 3).
 
   ### ⚠ BREAKING
-  - **`zone` value `'peak'` removed.** `Zone` is now `energized | steady | flagging | depleted` (ADR-0011 canonical). `Zone`/`zoneSchema` and `CrsResult`/`crsResultSchema` now live solely in `health/crs.ts`; `core/trigger.ts` and `adapters/health.ts` import from there (no duplicate exports).
+  - **`zone` value `'peak'` removed.** `Zone` is now `energized | steady | flagging | depleted` (ADR-0011 canonical). `Zone`/`zoneSchema` and `CrsResult`/`crsResultSchema` now live solely in `health/crs.ts`; `core/trigger.ts` and `adapters/health.ts` import from there (no duplicate exports). Form-zone preference fields reconciled too: `proposeScheduleArgs.prefer_user_form_zone` and `CalendarProvider.find_slots(...).prefer_zone` now use `energized` (was `peak`); `avoid_trough` stays (scheduling intent, not a Zone value).
+  - **`HookPayload` reshaped to the ADR-0029 pinned union** (snake_case `trace_id`/`tokens_in`/`tokens_out`/`latency_ms`; per-event fields only — `traceId`/`trigger` dropped since they already arrive via `InvocationContext`). `HookResult` now carries `payload?` (full replacement, ADR-0032 runner) + machine-readable `code: ErrorCode` on halt; `HookHandler` gains `name` + optional `timeout_ms` (ADR-0032). Casing note: payload fields use ADR-0029 snake_case while `InvocationContext.traceId` keeps its v0.1.0 camelCase — a package-wide casing reconcile is deferred (out of scope for this change).
 
 ## 0.1.0
 

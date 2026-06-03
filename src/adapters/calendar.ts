@@ -42,7 +42,7 @@ export interface CalendarProvider {
     duration_min: number;
     earliest: string;
     latest: string;
-    prefer_zone?: 'peak' | 'steady' | 'avoid_trough';
+    prefer_zone?: 'energized' | 'steady' | 'avoid_trough';
   }): Promise<
     | { ok: true; slots: Slot[] }
     | { ok: false; error: string; code: z.infer<typeof errorCodeSchema> }

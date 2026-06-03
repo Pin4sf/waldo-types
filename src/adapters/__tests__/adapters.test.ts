@@ -235,10 +235,19 @@ describe('CalendarProvider structural (stub)', () => {
     const mock: CalendarProvider = {
       provider: 'google_calendar',
       query_events: async () => ({ ok: true, events: [] }),
-      find_slots: async () => ({ ok: true, slots: [] }),
+      // find_slots.prefer_zone accepts the v0.2.0 canonical Form-zone value (peak → energized)
+      find_slots: async (args) => { void args.prefer_zone; return { ok: true, slots: [] }; },
       propose_event: async () => ({ ok: true, event_id: 'ev_01', decision_id: 'dec_01' }),
     };
     expect(mock.provider).toBe('google_calendar');
+  });
+  it('prefer_zone is type-only — energized assignable, peak rejected (v0.2.0 canonical)', () => {
+    // type-level proof: a TS union cannot be runtime-rejected, so tsc carries the assertion.
+    const energized: Parameters<CalendarProvider['find_slots']>[0]['prefer_zone'] = 'energized';
+    expect(energized).toBe('energized');
+    // @ts-expect-error 'peak' is stale (removed v0.2.0); typecheck fails if it ever re-enters the union
+    const peak: Parameters<CalendarProvider['find_slots']>[0]['prefer_zone'] = 'peak';
+    void peak;
   });
 });
 
