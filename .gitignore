@@ -9,3 +9,27 @@ dist/
 .claude/skills/*
 !.claude/skills/session-bus.md
 skills-lock.json
+
+# Matt-Pocock + architecture skill toolkit — tracked so cloners get them (2026-06-03)
+!.claude/skills/architecture-copilot/
+!.claude/skills/architecture-copilot/**
+!.claude/skills/diagnose/
+!.claude/skills/diagnose/**
+!.claude/skills/grill-with-docs/
+!.claude/skills/grill-with-docs/**
+!.claude/skills/improve-codebase-architecture/
+!.claude/skills/improve-codebase-architecture/**
+!.claude/skills/prototype/
+!.claude/skills/prototype/**
+!.claude/skills/setup-matt-pocock-skills/
+!.claude/skills/setup-matt-pocock-skills/**
+!.claude/skills/tdd/
+!.claude/skills/tdd/**
+!.claude/skills/to-issues/
+!.claude/skills/to-issues/**
+!.claude/skills/to-prd/
+!.claude/skills/to-prd/**
+!.claude/skills/triage/
+!.claude/skills/triage/**
+!.claude/skills/zoom-out/
+!.claude/skills/zoom-out/**
