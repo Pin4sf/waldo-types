@@ -13,7 +13,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   publish:
@@ -28,7 +27,7 @@ jobs:
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.2
         with:
           node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@pin4sf'
 
       - name: Verify tag matches package version
@@ -54,7 +53,7 @@ jobs:
       - name: Pack dry-run (verify tarball contents)
         run: npm pack --dry-run
 
-      - name: Publish to GitHub Packages
+      - name: Publish to npmjs
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
