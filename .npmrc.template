@@ -1,4 +1,0 @@
-# Copy to .npmrc and set NPM_TOKEN to a GitHub PAT with read:packages scope.
-# Downstream repos (waldo-backend, waldo-app) need this to install @pin4sf/waldo-types.
-@pin4sf:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NPM_TOKEN}

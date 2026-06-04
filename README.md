@@ -4,10 +4,30 @@ Shared TypeScript contracts for Waldo. Single npm package consumed by `waldo-bac
 
 ## Install
 
+Published to public npmjs registry. No `.npmrc` config required.
+
 ```bash
-# .npmrc must point @pin4sf scope to GitHub Packages (copy .npmrc.template)
 npm install @pin4sf/waldo-types
+# or pin to a minor:
+npm install @pin4sf/waldo-types@^0.2.0
 ```
+
+## Publishing (maintainers)
+
+CI workflow (`.github/workflows/publish.yml`) auto-stages on tag push (`v*`). Staged tarballs require manual approval before going public — supply-chain safety gate.
+
+```bash
+# release flow:
+# 1. bump version in package.json (follows semver — v0.x is pre-stable)
+# 2. commit + push
+# 3. tag and push: git tag v0.X.Y && git push origin v0.X.Y
+# 4. CI runs typecheck + tests + build + `npm stage publish --provenance`
+# 5. approve via UI or CLI:
+#      https://www.npmjs.com/settings/pin4sf/staged-packages
+#      npm stage list && npm stage approve <stage-id>
+```
+
+Tarball ships with sigstore provenance attestation linking the artifact to the GitHub Actions build commit. Consumers can verify via `npm audit signatures`.
 
 ## Package structure
 

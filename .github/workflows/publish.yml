@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write  # for npm --provenance attestation (sigstore OIDC)
 
 jobs:
   publish:
@@ -53,7 +54,12 @@ jobs:
       - name: Pack dry-run (verify tarball contents)
         run: npm pack --dry-run
 
-      - name: Publish to npmjs
-        run: npm publish
+      - name: Stage publish to npmjs (requires manual approval to go public)
+        run: npm stage publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Print approval instructions
+        run: |
+          echo "::notice title=Staged publish complete::Approve via 'npm stage approve <stage-id>' OR https://www.npmjs.com/settings/pin4sf/staged-packages"
+          echo "List staged: npm stage list"
