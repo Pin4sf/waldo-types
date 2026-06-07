@@ -80,7 +80,7 @@ Source of truth for all decisions:
   - **ADR-0021** Copilot tool surface (+7 tools)
   - **ADR-0040** CalendarProvider Phase 1
   - **ADR-0041** Voice memo pipeline (TranscriptionProvider adapter)
-- **`waldo-brain/.claude/rules/`** — coding rules, NEVER list, language
+- **`.claude/rules/`** — local mirrors of the universal coding rules, security checklist, and language
 - **`waldo-brain/03-References/ADL/`** — research grounding
 
 ## Rules
