@@ -1,5 +1,20 @@
 # waldo-types — Claude Code Instructions
 
+## Universal Cross-Repo Rules (read first)
+
+These four files are mirrored from `waldo-brain` (the canonical source per [ADR-0063](https://github.com/Pin4sf/waldo-brain/blob/main/01-Waldo/Architecture%20Decision%20Records%20%28ADR%29/0063-canonical-rule-files-mirroring.md)). Read them before this file.
+
+| File | What it governs |
+|---|---|
+| [`.claude/rules/posture.md`](.claude/rules/posture.md) | Role · truthfulness (`[inference]`/`[blocked]`) · communication · verification · destructive actions. Read first. |
+| [`.claude/rules/mental-model.md`](.claude/rules/mental-model.md) | 6 disciplines: problem-first · product-first · first-principles · test-heavy · NO AI SLOP · architecture-first. |
+| [`.claude/rules/language.md`](.claude/rules/language.md) | Architecture vocabulary (Module · Interface · Seam · Adapter · Depth · Leverage · Locality). |
+| [`.claude/rules/hey-109-workflow.md`](.claude/rules/hey-109-workflow.md) | Multi-agent coordination — cluster split (waldo-types is Claude's), Linear labels, Agent-Ready bar. |
+
+See [`.claude/rules/INDEX.md`](.claude/rules/INDEX.md) for the full index + per-type ADR map.
+
+---
+
 ## What this repo is
 
 The **shared type contract** for Waldo. One npm package: `@waldo/types`. Consumed by `waldo-backend` (Supabase Edge Functions + CF Worker + Durable Object) and `waldo-app` (Expo iOS + Android). Zero runtime code. Just types + Zod schemas + adapter interfaces.
@@ -90,15 +105,16 @@ Commit message ≤70 chars subject. Body explains the WHY (not WHAT — diff sho
 - Never embed secrets in types (no API key constants, no production URLs)
 - Never log raw health values (HRV, HR, sleep hours, SpO2) — applies even in test fixtures
 
-## Mental model (the 4 non-negotiable disciplines)
+## Mental model (the 6 non-negotiable disciplines)
 
-Before any work, read **`waldo-brain/.claude/rules/mental-model.md`**. It is the meta-rule that all other rules build on. Summary:
+Before any work, read [`.claude/rules/mental-model.md`](.claude/rules/mental-model.md). It is the meta-rule that all other rules build on. Summary:
 
 1. **Problem-first thinking** — find ROOT CAUSE at system + library level. Never patch symptoms. Use `/diagnose`.
 2. **Product-first thinking** — every line traces to a JTBD. If you can't name the user problem, delete it. Use `/grill-me`.
 3. **First-principles thinking** — decompose every claim to physics-level constraints. Cite primary sources. Use `/grill-with-docs`.
 4. **Test-heavy + thorough QA** — E2E is the only truth. Failing test FIRST. Use `/tdd` + `qa-breaker`.
-5. **NO AI SLOP** — every line earns its place. Slop = correct-but-bad: verbose where tight wins, generic where specific is needed, hedged where opinion was asked, format-drift, unrequested disclaimers, junk that fills context windows for the next session. Each line of code answers: WHY is it here, is it solving the requested purpose, is it the real fix not a patch, would a thoughtful reviewer ship it without changes. Delete anything that fails the test. See `waldo-brain/.claude/rules/mental-model.md` §5.
+5. **NO AI SLOP** — every line earns its place. Slop = correct-but-bad: verbose where tight wins, generic where specific is needed, hedged where opinion was asked, format-drift, unrequested disclaimers, junk that fills context windows for the next session. Each line of code answers: WHY is it here, is it solving the requested purpose, is it the real fix not a patch, would a thoughtful reviewer ship it without changes. Delete anything that fails the test. See [`.claude/rules/mental-model.md`](.claude/rules/mental-model.md) §5.
+6. **Architecture-first** — services, ownership, state — get them right before code. Name the services touched, locate the state, draw the boundary, check against locked ADRs. New service / new state location / new ownership boundary = ADR, not commit. See [`.claude/rules/mental-model.md`](.claude/rules/mental-model.md) §6.
 
 ## Build → Break → Fix philosophy (for THIS repo)
 
